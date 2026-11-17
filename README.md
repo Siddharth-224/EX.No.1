@@ -1,220 +1,81 @@
-# Arithmetic-operation-using-8086
-# 8086 Assembly Language Programs for Arithmetic Operations
+# STEPPER MOTOR INTERFACING
 
 ## AIM
-
-To write and execute Assembly Language Programs to perform arithmetic operations for the 8086 microprocessor.
+To write an assembly language program in 8086 to rotate the motor at different speeds.
 
 ---
 
 ## APPARATUS REQUIRED
 
-* Personal Computer with MASM Software
+| S. No | Item                        | Specification   | Quantity |
+|-------|-----------------------------|-----------------|----------|
+| 1     | Microprocessor kit          | 8086            | 1        |
+| 2     | Power Supply                | +5 V DC, +12 V DC | 1      |
+| 3     | Stepper Motor Interface board | -             | 1        |
+| 4     | Stepper Motor               | -               | 1        |
 
 ---
 
-## 1. ADDITION
+## THEORY
+A motor in which the rotor is able to assume only discrete stationary angular positions is a **stepper motor**. The rotary motion occurs in a stepwise manner from one equilibrium position to the next.  
 
-#### Algorithm
+**Two-phase scheme:** Any two adjacent stator windings are energized. There are two magnetic fields active in quadrature and none of the rotor pole faces can be in direct alignment with the stator poles. A partial but symmetric alignment of the rotor poles is of course possible.
 
-1. Initialize memory location in HL register.
-2. Store 1st data.
-3. Increment HL to enter 2nd data.
-4. Move 2nd number to accumulator.
-5. Decrement HL.
-6. Add value in memory with accumulator.
-7. Store result.
-8. Stop.
+---
 
+## ALGORITHM
+For running the stepper motor in clockwise and anticlockwise directions:
 
-## FLOW CHART
-<img width="707" height="1024" alt="image" src="https://github.com/user-attachments/assets/b5a7062d-e294-47cd-9683-a40de25e82de" />
+1. Get the first data from the lookup table.  
+2. Initialize the counter and move data into the accumulator.  
+3. Drive the stepper motor circuitry and introduce delay.  
+4. Decrement the counter. If not zero, repeat from step (iii).  
+5. Repeat the above procedure both for backward and forward directions.  
 
+---
 
-#### Program
+## SWITCHING SEQUENCE OF STEPPER MOTOR
+
+| Memory Location | A1 | A2 | B1 | B2 | Hex Code |
+|-----------------|----|----|----|----|----------|
+| 1200            | 1  | 0  | 0  | 0  | 09H      |
+| 1201            | 0  | 1  | 0  | 1  | 05H      |
+| 1202            | 0  | 1  | 1  | 0  | 06H      |
+| 1203            | 1  | 0  | 1  | 0  | 0AH      |
+
+---
+
+## PROGRAM
 
 ```asm
-CODE SEGMENT
-ASSUME CS:CODE, DS:CODE
-ORG 1000H
-MOV CL,00H
-MOV AX,1234H
-MOV BX,1234H
-ADD AX,BX
-JNC L1
-INC CL
-L1:MOV SI,1200H
-MOV [SI],AX
-MOV [SI+2],CL
-MOV AH,4CH
-INT 21H
-CODE ENDS
-END
+; Stepper Motor Interfacing Program in 8086 Assembly
+
+START:   MOV DI, 1200H        ; Initialize memory location to store array
+         MOV CX, 0004H        ; Initialize array size
+
+DOWN1:   MOV AL, [DI]         ; Copy the first data into AL
+         OUT C0, AL           ; Send it through port address
+
+         MOV DX, 1010H        ; Delay subroutine
+L1:      DEC DX
+         JNZ L1
+
+         INC DI               ; Go to next memory location
+         LOOP DOWN1           ; Repeat until all data is sent
+
+         JMP START            ; Continuous rotation
+
+         HLT                  ; Stop
+
+DATA:    DB 09H, 05H, 06H, 0AH ; Array of data
 ```
+## OUTPUT OF THE PROGRAM:
 
-#### Output Table
+<img width="823" height="486" alt="image" src="https://github.com/user-attachments/assets/9315d1b4-f43f-474a-998d-5c1c54ed85c4" />
 
-| MEMORY LOCATION (INPUT) | MEMORY LOCATION (OUTPUT) |
-| ----------------------- | ------------------------ |
-|       1200🔢       01         12
-
-|         1200                    |
-
-#### Manual Calculations
-
-(Add your calculation here)
-
----
-
-## OUTPUT IMAGE FROM MASM SOFTWARE
-
-## 2. SUBTRACTION
-
-#### Algorithm
-
-1. Initialize memory and store 1st data.
-2. Increment to get 2nd data.
-3. Move 2nd data to accumulator.
-4. Subtract memory content.
-5. Store result.
-
-## FLOWCHART
-
-<img width="578" height="797" alt="image" src="https://github.com/user-attachments/assets/564c3c7a-33ce-4a1c-8920-beb5c24b9b47" />
-
-
-#### Program
-```asm
-CODE SEGMENT
-ASSUME CS: CODE, DS: CODE
-ORG 1000H
-MOV SI,2000H
-MOV CL,00H
-MOV AX,[SI]
-MOV BX,[SI+02H]
-SUB AX,BX
-JNC L1
-INC CL
-L1:
-MOV [SI+04H],AX
-MOV [SI+06H],CL
-MOV AH,4CH
-INT 21H
-CODE ENDS
-END
-```
-
-
-#### Output Table
-
-| MEMORY LOCATION (INPUT) | MEMORY LOCATION (OUTPUT) |
-| ----------------------- | ------------------------ |
-|                         |                          |
-
-#### Manual Calculations
-
-(Add your calculation here)
-
----
-
-
-## OUTPUT SCREEN FROM MASM SOFTWARE
-
-## 3. MULTIPLICATION
-
-#### Algorithm
-
-1. Initialize memory and store operands.
-2. Move operands to registers.
-3. Multiply.
-4. Store result.
-
-##FLOWCHART
-
-<img width="569" height="906" alt="image" src="https://github.com/user-attachments/assets/88be88ff-2896-4a88-b73d-84ccffd2fcf9" />
-
-
-
-#### Program
-
-```asm
-CODE SEGMENT
-ASSUME CS: CODE, DS: CODE
-ORG 1000H
-MOV SI,2000H
-MOV DX,0000H
-MOV AX,[SI]
-MOV BX,[SI+02H]
-MUL BX
-MOV [SI+04H],AX
-MOV [SI+06H],DX
-MOV AH,4CH
-INT 21H
-CODE ENDS
-END
-```
-
-#### Output Table
-
-| MEMORY LOCATION (INPUT) | MEMORY LOCATION (OUTPUT) |
-| ----------------------- | ------------------------ |
-|                         |                          |
-
-#### Manual Calculations
-
-(Add your calculation here)
-
----
-
-## OUTPUT SCREEN FROM MASM SOFTWARE
-
-## 4. DIVISION
-
-#### Algorithm
-
-1. Load memory location of operands.
-2. Perform division.
-3. Store result.
-
-   ## FLOWCHART
-<img width="1065" height="802" alt="image" src="https://github.com/user-attachments/assets/25b4a483-0d42-494b-8639-1af3ea17191b" />
-
-
-#### Program
-
-```asm
-CODE SEGMENT
-ASSUME CS: CODE, DS: CODE
-ORG 1000H
-MOV SI,2000H
-MOV DX,0000H
-MOV AX,[SI]
-MOV BX,[SI+02H]
-DIV BX
-MOV [SI+04H],AX
-MOV [SI+06H],DX
-MOV AH,4CH
-INT 21H
-CODE ENDS
-END
-```
-
-#### Output Table
-
-| MEMORY LOCATION (INPUT) | MEMORY LOCATION (OUTPUT) |
-| ----------------------- | ------------------------ |
-|                         |                          |
-
-#### Manual Calculations
-
-(Add your calculation here)
-
----
-## OUTPUT FROM MASM SOFTWARE
-
+<img width="982" height="766" alt="WhatsApp Image 2026-07-31 at 2 16 57 PM" src="https://github.com/user-attachments/assets/261f179a-c357-4041-9972-3fd948d29f15" />
 
 
 ## RESULT
-
 Thus, the Assembly Language Programs for 8086 to perform arithmetic operations (Addition, Subtraction, Multiplication, and Division) using both direct and indirect methods were successfully written and executed using MASM.
 
